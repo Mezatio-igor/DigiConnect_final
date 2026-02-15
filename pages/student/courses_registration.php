@@ -87,7 +87,7 @@ $registeredCourses = $registeredStmt->fetchAll();
         </li>
 
         <li class="nav-item active">
-            <a class="nav-link" href="course_registration.php">
+            <a class="nav-link" href="courses_registration.php">
                 <i class="fas fa-book"></i>
                 <span>Course Registration</span>
             </a>

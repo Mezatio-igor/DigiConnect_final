@@ -89,14 +89,14 @@ if (!$university) {
     <?php endif; ?>
 
     <li class="nav-item">
-        <a class="nav-link" href="../../resources.php">
+        <a class="nav-link" href="../shared/resources.php">
             <i class="fas fa-globe-africa"></i>
             <span>Global Resources</span>
         </a>
     </li>
 
     <li class="nav-item">
-        <a class="nav-link" href="../../forum.php">
+        <a class="nav-link" href="../shared/forum.php">
             <i class="fas fa-comments"></i>
             <span>Community Forum</span>
         </a>

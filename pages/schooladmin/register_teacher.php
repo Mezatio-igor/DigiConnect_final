@@ -69,12 +69,12 @@ $departments = $deptStmt->fetchAll();
 <div id="wrapper">
     <!-- Sidebar -->
     <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion">
-        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="../index.php">
+        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="../../index.php">
             <div class="sidebar-brand-text mx-3" style="font-size: 1.4rem;">DigiConnect <sup>4.0</sup></div>
         </a>
         <hr class="sidebar-divider">
         <li class="nav-item"><a class="nav-link" href="../schooladmin/dashboard.php"><i class="fas fa-school"></i> My University</a></li>
-        <li class="nav-item"><a class="nav-link" href="register_student.php"><i class="fas fa-user-graduate"></i> Register Student</a></li>
+        <li class="nav-item"><a class="nav-link" href="../../register_student.php"><i class="fas fa-user-graduate"></i> Register Student</a></li>
         <li class="nav-item active"><a class="nav-link" href="register_teacher.php"><i class="fas fa-chalkboard-teacher"></i> Register Teacher</a></li>
         <li class="nav-item"><a class="nav-link" href="../shared/resources.php"><i class="fas fa-globe-africa"></i> Global Resources</a></li>
         <li class="nav-item"><a class="nav-link" href="../shared/forum.php"><i class="fas fa-comments"></i> Community Forum</a></li>

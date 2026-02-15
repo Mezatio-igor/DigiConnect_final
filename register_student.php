@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <div class="sidebar-brand-text mx-3" style="font-size: 1.4rem;">DigiConnect <sup>4.0</sup></div>
             </a>
             <hr class="sidebar-divider">
-            <li class="nav-item"><a class="nav-link" href="school_dashboard.php"><i class="fas fa-school"></i> My University</a></li>
+            <li class="nav-item"><a class="nav-link" href="pages/schooladmin/dashboard.php"><i class="fas fa-school"></i> My University</a></li>
             <li class="nav-item active"><a class="nav-link" href="register_student.php"><i class="fas fa-user-graduate"></i> Register Student</a></li>
             <li class="nav-item"><a class="nav-link" href="resources.php"><i class="fas fa-globe-africa"></i> Global Resources</a></li>
             <li class="nav-item"><a class="nav-link" href="forum.php"><i class="fas fa-comments"></i> Community Forum</a></li>

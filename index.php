@@ -113,13 +113,15 @@ $role = isset($_SESSION['role']) ? $_SESSION['role'] : 'Unknown';
 
     <hr class="sidebar-divider my-0">
 
-    <!-- Common to all -->
+    <!-- Academic Resources (Not for SuperAdmin) -->
+    <?php if ($_SESSION['role'] != 'SuperAdmin'): ?>
     <li class="nav-item">
         <a class="nav-link" href="pages/shared/resources.php">
             <i class="fas fa-folder-open"></i>
             <span>Academic Resources</span>
         </a>
     </li>
+    <?php endif; ?>
 
     <!-- SuperAdmin only -->
     <?php if ($_SESSION['role'] == 'SuperAdmin'): ?>
@@ -139,6 +141,12 @@ $role = isset($_SESSION['role']) ? $_SESSION['role'] : 'Unknown';
         <a class="nav-link" href="register_schooladmin.php">
             <i class="fas fa-user-shield"></i>
             <span>Add SchoolAdmin</span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="announcements.php">
+            <i class="fas fa-bell"></i>
+            <span>Send Announcements</span>
         </a>
     </li>
     <?php endif; ?>
@@ -170,13 +178,15 @@ $role = isset($_SESSION['role']) ? $_SESSION['role'] : 'Unknown';
     </li>
     <?php endif; ?>
 
-    <!-- Community (secondary) -->
+    <!-- Community (Not for SuperAdmin) -->
+    <?php if ($_SESSION['role'] != 'SuperAdmin'): ?>
     <li class="nav-item">
         <a class="nav-link" href="pages/shared/forum.php">
             <i class="fas fa-comments"></i>
             <span>Community Forum</span>
         </a>
     </li>
+    <?php endif; ?>
 
     <hr class="sidebar-divider d-none d-md-block">
 </ul>

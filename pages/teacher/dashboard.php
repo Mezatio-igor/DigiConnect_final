@@ -46,7 +46,7 @@ $timetables = $timetableStmt->fetchAll();
 <div id="wrapper">
     <!-- Sidebar -->
     <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="../index.php">
+        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="../../index.php">
             <div class="sidebar-brand-text mx-3" style="font-size: 1.4rem;">DigiConnect <sup>4.0</sup></div>
         </a>
         <hr class="sidebar-divider my-0">

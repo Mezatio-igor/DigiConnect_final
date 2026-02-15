@@ -57,7 +57,7 @@ $timetables = $timetableStmt->fetchAll();
 <div id="wrapper">
     <!-- Sidebar -->
     <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="../index.php">
+        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="../../index.php">
             <div class="sidebar-brand-text mx-3" style="font-size: 1.4rem;">DigiConnect <sup>4.0</sup></div>
         </a>
         <hr class="sidebar-divider my-0">
@@ -84,11 +84,11 @@ $timetables = $timetableStmt->fetchAll();
         </li>
 
         <li class="nav-item">
-    <a class="nav-link" href="course_registration.php">
-        <i class="fas fa-book"></i>
-        <span>Register Courses</span>
-    </a>
-</li>
+            <a class="nav-link" href="courses_registration.php">
+                <i class="fas fa-book"></i>
+                <span>Register Courses</span>
+            </a>
+        </li>
 
         <hr class="sidebar-divider d-none d-md-block">
     </ul>
@@ -115,7 +115,7 @@ $timetables = $timetableStmt->fetchAll();
                 <div class="container-fluid py-5 mb-4" style="background-color: #FFC107; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
                     <div class="row align-items-center">
                         <div class="col-md-2 text-center">
-                            <img src="../../img/digiconnect-logo.png" alt="DigiConnect" style="height: 90px;">
+                            <img src="../../img/digiconnect-logo.jpg" alt="DigiConnect" style="height: 90px;">
                         </div>
                         <div class="col-md-10">
                             <h2 class="mb-1" style="color: #000; font-weight: bold;">
