@@ -86,6 +86,13 @@ if (!$university) {
     </a>
 </li>
 
+<li class="nav-item">
+    <a class="nav-link" href="pages/schooladmin/timetable_create.php">
+        <i class="fas fa-calendar-alt"></i>
+        <span>Timetable Management</span>
+    </a>
+</li>
+
     <?php endif; ?>
 
     <li class="nav-item">
