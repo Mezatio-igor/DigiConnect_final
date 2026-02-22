@@ -87,7 +87,7 @@ if (!$university) {
 </li>
 
 <li class="nav-item">
-    <a class="nav-link" href="pages/schooladmin/timetable_create.php">
+    <a class="nav-link" href="timetable_create.php">
         <i class="fas fa-calendar-alt"></i>
         <span>Timetable Management</span>
     </a>
@@ -157,67 +157,80 @@ if (!$university) {
                     </div>
 
                     <!-- Stats Cards -->
-                    <div class="row">
-                        <div class="col-xl-4 col-md-6 mb-4">
-                            <div class="card border-left-danger shadow h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Total Teachers</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">Coming Soon</div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-chalkboard-teacher fa-2x text-gray-300"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <?php
+// === ADD THIS CODE AT THE TOP (after include 'config/db_connect.php' and getting $universityID) ===
 
-                        <div class="col-xl-4 col-md-6 mb-4">
-                            <div class="card border-left-danger shadow h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Total Students</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">Coming Soon</div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-user-graduate fa-2x text-gray-300"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+// Total Teachers in this university
+$teacherCount = $conn->prepare("SELECT COUNT(*) FROM users WHERE role = 'Teacher' AND universityID = ?");
+$teacherCount->execute([$universityID]);
+$totalTeachers = $teacherCount->fetchColumn();
 
-                        <div class="col-xl-4 col-md-6 mb-4">
-                            <div class="card border-left-danger shadow h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Active Courses</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">Coming Soon</div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-book-open fa-2x text-gray-300"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+// Total Students in this university
+$studentCount = $conn->prepare("SELECT COUNT(*) FROM users WHERE role = 'Student' AND universityID = ?");
+$studentCount->execute([$universityID]);
+$totalStudents = $studentCount->fetchColumn();
+
+// Active Courses in this university
+$courseCount = $conn->prepare("SELECT COUNT(*) FROM courses WHERE universityID = ?");
+$courseCount->execute([$universityID]);
+$activeCourses = $courseCount->fetchColumn();
+?>
+
+<!-- ====================== STATS CARDS ====================== -->
+<div class="row">
+
+    <!-- Total Teachers -->
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card border-left-danger shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Total Teachers</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800"><?= number_format($totalTeachers) ?></div>
                     </div>
-
-                    <div class="card shadow mb-4">
-                        <div class="card-header py-3 bg-danger text-white">
-                            <h6 class="m-0 font-weight-bold">Quick Actions</h6>
-                        </div>
-                        <div class="card-body">
-                            <p>Teacher, Student, Course, and Assignment management coming soon!</p>
-                            <p>For now, you can explore the Global Resource Sharing when logged in as Student.</p>
-                        </div>
+                    <div class="col-auto">
+                        <i class="fas fa-chalkboard-teacher fa-2x text-gray-300"></i>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Total Students -->
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Students</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800"><?= number_format($totalStudents) ?></div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-user-graduate fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Courses -->
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Active Courses</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800"><?= number_format($activeCourses) ?></div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-book fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
 
             <!-- Footer -->
             <footer class="sticky-footer bg-white">

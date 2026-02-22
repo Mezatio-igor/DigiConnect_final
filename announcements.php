@@ -13,6 +13,52 @@ $name = $_SESSION['name'];
 $success_msg = '';
 $error_msg = '';
 
+// Handle announcement edit fetch
+$edit_announcement = null;
+if (isset($_GET['edit'])) {
+    $edit_id = intval($_GET['edit']);
+    $stmt = $conn->prepare("SELECT * FROM announcements WHERE announcementID = ?");
+    $stmt->execute([$edit_id]);
+    $edit_announcement = $stmt->fetch();
+    if (!$edit_announcement) {
+        $error_msg = "Announcement not found.";
+    }
+}
+
+// Handle announcement update
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_announcement'])) {
+    $edit_id = intval($_POST['announcementID']);
+    $title = trim($_POST['title']);
+    $message = trim($_POST['message']);
+    $target_role = isset($_POST['target']) ? $_POST['target'] : 'all';
+    if (empty($title) || empty($message)) {
+        $error_msg = "Title and message are required for update.";
+    } else {
+        $stmt = $conn->prepare("UPDATE announcements SET title = ?, message = ?, targetRole = ? WHERE announcementID = ?");
+        if ($stmt->execute([$title, $message, $target_role, $edit_id])) {
+            $success_msg = "Announcement updated successfully!";
+            header('Location: announcements.php');
+            exit();
+        } else {
+            $error_msg = "Failed to update announcement.";
+        }
+    }
+}
+
+// Handle announcement deletion
+if (isset($_GET['delete'])) {
+    $delete_id = intval($_GET['delete']);
+    $stmt = $conn->prepare("DELETE FROM announcements WHERE announcementID = ?");
+    if ($stmt->execute([$delete_id])) {
+        $success_msg = "Announcement deleted successfully!";
+        // Redirect to avoid resubmission
+        header('Location: announcements.php');
+        exit();
+    } else {
+        $error_msg = "Failed to delete announcement.";
+    }
+}
+
 // Handle announcement sending
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['send_announcement'])) {
     $title = trim($_POST['title']);
@@ -211,6 +257,41 @@ $announcements = $announcementsStmt->fetchAll();
                     <?php endif; ?>
 
                     <!-- Send Announcement Form -->
+                    <?php if ($edit_announcement): ?>
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3 bg-warning text-dark">
+                            <h6 class="m-0 font-weight-bold">Edit Announcement</h6>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST">
+                                <input type="hidden" name="announcementID" value="<?php echo htmlspecialchars($edit_announcement['announcementID']); ?>">
+                                <div class="form-group">
+                                    <label for="title">Announcement Title <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="title" name="title" value="<?php echo htmlspecialchars($edit_announcement['title']); ?>" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="message">Message <span class="text-danger">*</span></label>
+                                    <textarea class="form-control" id="message" name="message" rows="6" required><?php echo htmlspecialchars($edit_announcement['message']); ?></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="target_role">Send To <span class="text-danger">*</span></label>
+                                    <select name="target" class="form-control">
+                                        <option value="all" <?php if ($edit_announcement['targetRole'] == 'all') echo 'selected'; ?>>All Users</option>
+                                        <option value="schooladmins" <?php if ($edit_announcement['targetRole'] == 'schooladmins') echo 'selected'; ?>>SchoolAdmins Only</option>
+                                        <option value="teachers" <?php if ($edit_announcement['targetRole'] == 'teachers') echo 'selected'; ?>>Teachers Only</option>
+                                        <option value="students" <?php if ($edit_announcement['targetRole'] == 'students') echo 'selected'; ?>>Students Only</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <button type="submit" name="update_announcement" class="btn btn-warning">
+                                        <i class="fas fa-save"></i> Update Announcement
+                                    </button>
+                                    <a href="announcements.php" class="btn btn-secondary ml-2">Cancel</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <?php else: ?>
                     <div class="card shadow mb-4">
                         <div class="card-header py-3 bg-danger text-white">
                             <h6 class="m-0 font-weight-bold">Create New Announcement</h6>
@@ -221,22 +302,19 @@ $announcements = $announcementsStmt->fetchAll();
                                     <label for="title">Announcement Title <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="title" name="title" placeholder="e.g., System Maintenance Notice" required>
                                 </div>
-
                                 <div class="form-group">
                                     <label for="message">Message <span class="text-danger">*</span></label>
                                     <textarea class="form-control" id="message" name="message" rows="6" placeholder="Enter announcement message..." required></textarea>
                                 </div>
-
                                 <div class="form-group">
                                     <label for="target_role">Send To <span class="text-danger">*</span></label>
                                     <select name="target" class="form-control">
-    <option value="all">All Users</option>
-    <option value="schooladmins">SchoolAdmins Only</option>
-    <option value="teachers">Teachers Only</option>
-    <option value="students">Students Only</option>
-</select>
+                                        <option value="all">All Users</option>
+                                        <option value="schooladmins">SchoolAdmins Only</option>
+                                        <option value="teachers">Teachers Only</option>
+                                        <option value="students">Students Only</option>
+                                    </select>
                                 </div>
-
                                 <div class="form-group">
                                     <button type="submit" name="send_announcement" class="btn btn-danger">
                                         <i class="fas fa-paper-plane"></i> Send Announcement
@@ -245,6 +323,7 @@ $announcements = $announcementsStmt->fetchAll();
                             </form>
                         </div>
                     </div>
+                    <?php endif; ?>
 
                     <!-- Recent Announcements -->
                     <div class="card shadow">
@@ -263,6 +342,7 @@ $announcements = $announcementsStmt->fetchAll();
                                                 <th>Target Audience</th>
                                                 <th>Sent By</th>
                                                 <th>Date</th>
+                                                   <th>Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -276,6 +356,10 @@ $announcements = $announcementsStmt->fetchAll();
                                                 <td><span class="badge badge-primary"><?php echo htmlspecialchars($ann['targetRole']); ?></span></td>
                                                 <td><?php echo htmlspecialchars($ann['senderName']); ?></td>
                                                 <td><?php echo date('M d, Y H:i', strtotime($ann['createdDate'])); ?></td>
+                                                   <td>
+                                                       <a href="announcements.php?edit=<?php echo $ann['announcementID']; ?>" class="btn btn-sm btn-warning mr-1"><i class="fas fa-edit"></i> Edit</a>
+                                                       <a href="announcements.php?delete=<?php echo $ann['announcementID']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this announcement?');"><i class="fas fa-trash"></i> Delete</a>
+                                                   </td>
                                             </tr>
                                             <?php endforeach; ?>
                                         </tbody>

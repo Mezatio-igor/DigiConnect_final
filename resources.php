@@ -10,14 +10,6 @@ $name = $_SESSION['name'];
 $role = $_SESSION['role'];
 $universityID = isset($_SESSION['universityID']) ? $_SESSION['universityID'] : null;
 
-// Fetch all resources (public)
-$stmt = $conn->query("SELECT r.*, u.name AS uploaderName, univ.name AS uniName 
-                      FROM resources r 
-                      JOIN users u ON r.uploadedBy = u.userID 
-                      JOIN universities univ ON r.universityID = univ.universityID 
-                      ORDER BY uploadDate DESC");
-$resources = $stmt->fetchAll();
-
 // Upload handling
 $uploadMsg = '';
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && $role == 'Student') {
@@ -35,6 +27,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $role == 'Student') {
         }
     }
 }
+
+// Fetch all resources (public) - AFTER upload handling
+$stmt = $conn->query("SELECT r.*, u.name AS uploaderName, univ.name AS uniName 
+                      FROM resources r 
+                      JOIN users u ON r.uploadedBy = u.userID 
+                      JOIN universities univ ON r.universityID = univ.universityID 
+                      ORDER BY uploadDate DESC");
+$resources = $stmt->fetchAll();
 ?>
 
 <!DOCTYPE html>

@@ -10,31 +10,34 @@ $name = $_SESSION['name'];
 $role = $_SESSION['role'];
 $universityID = isset($_SESSION['universityID']) ? $_SESSION['universityID'] : null;
 
-// Fetch all resources (public)
-$stmt = $conn->query("SELECT r.*, u.name AS uploaderName, univ.name AS uniName 
-                      FROM resources r 
-                      JOIN users u ON r.uploadedBy = u.userID 
-                      JOIN universities univ ON r.universityID = univ.universityID 
-                      ORDER BY uploadDate DESC");
-$resources = $stmt->fetchAll();
-
 // Upload handling
 $uploadMsg = '';
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && $role == 'Student') {
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && in_array($role, ['Student', 'Teacher'])) {  // Allow teachers too
     $title = trim($_POST['title']);
     $description = trim($_POST['description']);
     $category = $_POST['category'];
+    $visibility = isset($_POST['visibility']) ? $_POST['visibility'] : 'all'; // 'all' or 'my_university'
 
     if (isset($_FILES['file']) && $_FILES['file']['error'] == 0) {
         $fileName = time() . '_' . basename($_FILES['file']['name']);
-        $target = "../../uploads/" . $fileName;
+        $target = "uploads/" . $fileName;
         if (move_uploaded_file($_FILES['file']['tmp_name'], $target)) {
-            $stmt = $conn->prepare("INSERT INTO resources (title, description, category, filePath, uploadedBy, universityID) VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$title, $description, $category, $target, $_SESSION['userID'], $universityID]);
+            $stmt = $conn->prepare("INSERT INTO resources (title, description, category, filePath, uploadedBy, universityID, visibility) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$title, $description, $category, $target, $_SESSION['userID'], $universityID, $visibility]);
             $uploadMsg = "Resource uploaded successfully!";
         }
     }
 }
+
+// Fetch all resources (filtered by visibility)
+$stmt = $conn->prepare("SELECT r.*, u.name AS uploaderName, univ.name AS uniName 
+                      FROM resources r 
+                      JOIN users u ON r.uploadedBy = u.userID 
+                      JOIN universities univ ON r.universityID = univ.universityID 
+                      WHERE (r.visibility = 'all' OR (r.visibility = 'my_university' AND r.universityID = ?))
+                      ORDER BY uploadDate DESC");
+$stmt->execute([$universityID]);
+$resources = $stmt->fetchAll();
 ?>
 
 <!DOCTYPE html>
@@ -118,83 +121,79 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $role == 'Student') {
                     <div class="alert alert-success"><?php echo $uploadMsg; ?></div>
                     <?php endif; ?>
 
-                    <!-- Upload Form (only for Students - we'll add Student role later) -->
-                    <div class="card shadow mb-4">
-                        <div class="card-header py-3 bg-danger text-white">
-                            <h6 class="m-0 font-weight-bold">Upload New Resource</h6>
-                        </div>
-                        <div class="card-body">
-                            <form method="POST" enctype="multipart/form-data">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Title</label>
-                                            <input type="text" name="title" class="form-control" required>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Category</label>
-                                            <select name="category" class="form-control">
-                                                <option>Notes</option>
-                                                <option>Assignment</option>
-                                                <option>Past Paper</option>
-                                                <option>Project</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Description</label>
-                                            <textarea name="description" class="form-control" rows="3"></textarea>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>File (PDF, DOC, etc.)</label>
-                                            <input type="file" name="file" class="form-control" required>
-                                        </div>
-                                    </div>
-                                </div>
-                                <button type="submit" class="btn btn-danger">Upload Resource</button>
-                            </form>
-                        </div>
+                   <!-- Update the Upload Form (add visibility) -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3 bg-danger text-white">
+        <h6 class="m-0 font-weight-bold">Upload New Resource</h6>
+    </div>
+    <div class="card-body">
+        <form method="POST" enctype="multipart/form-data">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Title</label>
+                        <input type="text" name="title" class="form-control" required>
                     </div>
-
-                    <!-- Resources List -->
-                    <div class="card shadow">
-                        <div class="card-header py-3 bg-danger text-white">
-                            <h6 class="m-0 font-weight-bold">Shared Resources</h6>
-                        </div>
-                        <div class="card-body">
-                            <?php if (empty($resources)): ?>
-                                <p>No resources yet. Be the first to upload!</p>
-                            <?php else: ?>
-                                <div class="row">
-                                    <?php foreach ($resources as $res): ?>
-                                    <div class="col-md-6 mb-4">
-                                        <div class="card">
-                                            <div class="card-body">
-                                                <h5><?php echo htmlspecialchars($res['title']); ?></h5>
-                                                <p><strong>Category:</strong> <?php echo htmlspecialchars($res['category']); ?></p>
-                                                <p><strong>Uploaded by:</strong> <?php echo htmlspecialchars($res['uploaderName']); ?> 
-                                                    (<?php echo htmlspecialchars($res['uniName']); ?>)</p>
-                                                <p><strong>Date:</strong> <?php echo $res['uploadDate']; ?></p>
-                                                <a href="<?php echo $res['filePath']; ?>" class="btn btn-primary" target="_blank">Download</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <?php endforeach; ?>
-                                </div>
-                            <?php endif; ?>
-                        </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select name="category" class="form-control">
+                            <option>Notes</option>
+                            <option>Assignment</option>
+                            <option>Past Paper</option>
+                            <option>Project</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Visibility</label>
+                        <select name="visibility" class="form-control">
+                            <option value="all">All Universities</option>
+                            <option value="my_university">My University Only</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea name="description" class="form-control" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>File (PDF, DOC, etc.)</label>
+                        <input type="file" name="file" class="form-control" required>
                     </div>
                 </div>
             </div>
-            <footer class="sticky-footer bg-white">
-                <div class="container my-auto">
-                    <div class="copyright text-center my-auto">
-                        <span>DigiConnect © 2025</span>
+            <button type="submit" class="btn btn-danger">Upload Resource</button>
+        </form>
+    </div>
+</div>
+
+<!-- Resources List (with visibility shown) -->
+<div class="card shadow">
+    <div class="card-header py-3 bg-danger text-white">
+        <h6 class="m-0 font-weight-bold">Shared Resources</h6>
+    </div>
+    <div class="card-body">
+        <?php if (empty($resources)): ?>
+            <p>No resources yet. Be the first to upload!</p>
+        <?php else: ?>
+            <div class="row">
+                <?php foreach ($resources as $res): ?>
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5><?= htmlspecialchars($res['title']) ?></h5>
+                            <p><strong>Category:</strong> <?= htmlspecialchars($res['category']) ?></p>
+                            <p><strong>Uploaded by:</strong> <?= htmlspecialchars($res['uploaderName']) ?> (<?= htmlspecialchars($res['uniName']) ?>)</p>
+                            <p><strong>Date:</strong> <?= $res['uploadDate'] ?></p>
+                            <p><strong>Visibility:</strong> <?= $res['visibility'] === 'all' ? 'All Universities' : 'My University Only' ?></p>
+                            <a href="<?= $res['filePath'] ?>" class="btn btn-danger" target="_blank">Download</a>
+                        </div>
                     </div>
                 </div>
-            </footer>
-        </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
     </div>
+</div>
 </body>
 </html>
